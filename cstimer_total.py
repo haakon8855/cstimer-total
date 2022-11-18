@@ -1,6 +1,9 @@
+"""haakon8855, forked from AxelFl/CSTimer-Total"""
+
 import glob
 import json
 import math
+import sys
 
 total_solves = 0
 total_time_ms = 0
@@ -12,20 +15,21 @@ session_stats = []
 file_names = glob.glob("*.txt")
 if len(file_names) != 1:
     print("Please have 1 .txt file in this directory")
-    exit()
+    sys.exit()
 else:
     file_name = file_names[0]
 
 # Loads the found file
-with open(file_name, "r") as file:
+with open(file_name, "r", encoding="utf-8") as file:
     text = file.read()
 
-# Make read string into a JSON file, if it is an invalid file, ask the user for a good file and exit the program
+# Make read string into a JSON file, if it is an invalid file,
+# ask the user for a good file and exit the program
 try:
     json_file = json.loads(text)
 except json.JSONDecodeError:
     print("Please supply a valid CSTimer file")
-    exit()
+    sys.exit()
 
 # Go through all the sessions in the file,
 # Range should be + 1 to reach the last one, because it is not inclusive
@@ -65,11 +69,11 @@ for session_nr in range(1, len(session_data) + 1):
 # Calculate the time in hours, minutes and seconds
 # Function because it is used multiple times
 # Returns a tuple with the times
-def get_time(ms):
+def get_time(millis):
     # Everything gets floored because it gets covered by the lower unit
     # Seconds are so small and just gets rounded anyways
     # First and second is obvious
-    seconds = ms / 1000
+    seconds = millis / 1000
     hours = math.floor(seconds / 3600)
     # Gives me total minutes mod 60 because the rest are taken by hours
     minutes = math.floor((seconds / 60) % 60)
