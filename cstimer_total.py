@@ -37,9 +37,6 @@ except json.JSONDecodeError:
 for session_nr in range(1, len(json_file)):
     session = json_file["session%s" % session_nr]
 
-    # Don't know why this works or why it's needed
-    session = json.loads(session)
-
     # First index is time and second is number of solves
     # Third is the name of the session which will be filled in later
     session_stats.append([0, 0, None])
@@ -56,8 +53,11 @@ for session_nr in range(1, len(json_file)):
         # Add the time to that sessions stats
         session_stats[session_nr - 1][0] += time_ms
 
-# Load into the part where the session names are
-properties = json.loads(json_file["properties"])
+# Load cstimer properties
+properties = json_file["properties"]
+# Load session metadata
+# json.loads() is needed once again due to contents of properties["sessionData"]
+# being a string of json-encoded data.
 session_data = json.loads(properties["sessionData"])
 # For all the session add the sessions name to session_stats
 for session_nr in range(1, len(session_data) + 1):
@@ -159,5 +159,3 @@ for session in session_stats:
     else:
         print("Average time: %s hours, %s minutes and %s seconds" %
               get_time(session[0] / session[1]))
-
-input()
