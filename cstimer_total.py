@@ -35,7 +35,7 @@ except json.JSONDecodeError:
 # Range should be + 1 to reach the last one, because it is not inclusive
 # But since we have an extra object with session no modification is required
 for session_nr in range(1, len(json_file)):
-    session = json_file["session%s" % session_nr]
+    session = json_file[f"session{session_nr}"]
 
     # First index is time and second is number of solves
     # Third is the name of the session which will be filled in later
@@ -66,10 +66,11 @@ for session_nr in range(1, len(session_data) + 1):
     session_stats[session_nr - 1][2] = session_name
 
 
-# Calculate the time in hours, minutes and seconds
-# Function because it is used multiple times
-# Returns a tuple with the times
 def get_time(millis):
+    """
+    Calculate the time in hours, minutes and seconds
+    Returns a tuple with the times (hrs, mins, secs)
+    """
     # Everything gets floored because it gets covered by the lower unit
     # Seconds are so small and just gets rounded anyways
     # First and second is obvious
@@ -97,65 +98,75 @@ for session in session_stats:
         highest_solves = session[1]
 
 # Print out all the special statistics at the end
+total_time = get_time(total_time_ms)
 print(
-    "You have spent a total of %s hours, %s minutes and %s seconds of solving in CSTimer"
-    % get_time(total_time_ms))
-print("With a total of %s solves" % total_solves)
+    f"You have spent a total of {total_time[0]} hours, " +
+    f"{total_time[1]} minutes and {total_time[2]} seconds of solving in CSTimer"
+)
+print(f"With a total of {total_solves} solves")
 
-# if the number of hours is 0, 0 evaluates to False in python, print the time without hours
-if not get_time((total_time_ms / total_solves))[0]:
-    # [1:] Gets the tuple without the hour
-    print("Average time: %s minutes and %s seconds" % get_time(
-        (total_time_ms / total_solves))[1:])
+# Only print hours if it is greater than zero, same for minutes
+avg_time = get_time((total_time_ms / total_solves))
+if avg_time[0] > 0:
+    print(
+        f"Average time: {avg_time[0]} hours, {avg_time[1]} minutes and {avg_time[2]} seconds"
+    )
+elif avg_time[1] > 0:
+    print(f"Average time: {avg_time[1]} minutes and {avg_time[2]} seconds")
 else:
-    print("Average time: %s hours, %s minutes and %s seconds" % get_time(
-        (total_time_ms / total_solves)))
+    print(f"Average time: {avg_time[2]} seconds")
 
-print("")
-print("The session you have spent the most time solving with is %s" %
-      most_used_time[2])
 print(
-    "In that session you spent a total of %s hours, %s minutes and %s seconds"
-    % get_time(most_used_time[0]))
-print("With a total of %s solves" % most_used_time[1])
+    f"\nThe session you have spent the most time solving with is {most_used_time[2]}"
+)
+longest_session = get_time(most_used_time[0])
+print(f"In that session you spent a total of {longest_session[0]} hours, " +
+      f"{longest_session[1]} minutes and {longest_session[2]} seconds")
+print(f"With a total of {most_used_time[1]} solves")
 
-# if the number of hours is 0, 0 evaluates to False in python, print the time without hours
-if not get_time(most_used_time[0] / most_used_time[1])[0]:
-    # [1:] Gets the tuple without the hour
-    print("Average time: %s minutes and %s seconds" % get_time(
-        (most_used_time[0] / most_used_time[1]))[1:])
+# Only print hours if it is greater than zero, same for minutes
+avg_time = get_time(most_used_time[0] / most_used_time[1])
+if avg_time[0] > 0:
+    print(
+        f"Average time: {avg_time[0]} hours, {avg_time[1]} minutes and {avg_time[2]} seconds"
+    )
+elif avg_time[1] > 0:
+    print(f"Average time: {avg_time[1]} minutes and {avg_time[2]} seconds")
 else:
-    print("Average time: %s hours, %s minutes and %s seconds" % get_time(
-        (most_used_time[0] / most_used_time[1])))
+    print(f"Average time: {avg_time[2]} seconds")
 
-print("")
-print("The session you have the most solves with is %s" % most_used_solves[2])
-print(
-    "In that session you spent a total of %s hours, %s minutes and %s seconds"
-    % get_time(most_used_solves[0]))
-print("With a total of %s solves" % most_used_solves[1])
+print(f"\nThe session you have the most solves with is {most_used_solves[2]}")
+most_solves = get_time(most_used_solves[0])
+print(f"In that session you spent a total of {most_solves[0]} hours, " +
+      f"{most_solves[1]} minutes and {most_solves[2]} seconds")
+print(f"With a total of {most_used_solves[1]} solves")
 
-# if the number of hours is 0, 0 evaluates to False in python, print the time without hours
-if not get_time(most_used_solves[0] / most_used_solves[1])[0]:
-    # [1:] Gets the tuple without the hour
-    print("Average time: %s minutes and %s seconds" %
-          get_time(most_used_solves[0] / most_used_solves[1])[1:])
+# Only print hours if it is greater than zero, same for minutes
+avg_time = get_time(most_used_solves[0] / most_used_solves[1])
+if avg_time[0] > 0:
+    print(
+        f"Average time: {avg_time[0]} hours, {avg_time[1]} minutes and {avg_time[2]} seconds"
+    )
+elif avg_time[1] > 0:
+    print(f"Average time: {avg_time[1]} minutes and {avg_time[2]} seconds")
 else:
-    print("Average time: %s hours, %s minutes and %s seconds" % get_time(
-        (most_used_solves[0] / most_used_solves[1])))
+    print(f"Average time: {avg_time[2]} seconds")
 
 # Prints out all of the stats at the end
 for session in session_stats:
-    print("")
-    print(session[2])
-    print("%s hours, %s minutes and %s seconds" % get_time(session[0]))
-    print("%s solves" % session[1])
+    print("\n" + str(session[2]))
+    time = get_time(session[0])
+    print(f"{time[0]} hours, {time[1]} minutes and {time[2]} seconds")
+    print(f"{session[1]} solves")
     # If there are no solves, there is no average
     if not session[1]:
         continue
-    if not get_time(session[0] / session[1])[0]:
-        print("Average time: %s minutes and %s seconds" %
-              get_time(session[0] / session[1])[1:])
+    avg_time = get_time(session[0] / session[1])
+    if avg_time[0] > 0:
+        print(
+            f"Average time: {avg_time[0]} hours, {avg_time[1]} minutes and {avg_time[2]} seconds"
+        )
+    elif avg_time[1] > 0:
+        print(f"Average time: {avg_time[1]} minutes and {avg_time[2]} seconds")
     else:
-        print("Average time: %s hours, %s minutes and %s seconds" %
-              get_time(session[0] / session[1]))
+        print(f"Average time: {avg_time[2]} seconds")
